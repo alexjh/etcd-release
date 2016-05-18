@@ -61,10 +61,18 @@ case $1 in
 
     prior_member_list=$(member_list)
 
+    <% if spec.bootstrap %>
     if [ -z "${prior_member_list}" ]; then
       cluster_state=new
       cluster="${this_node}"
     else
+    <% end %>
+
+      while [ -z "${prior_member_list}" ]; do
+        prior_member_list=$(member_list)
+        sleep 2
+      done
+
       cluster_state=existing
       cluster=$(extract_cluster_from_member_list "${prior_member_list}")
 
@@ -78,7 +86,10 @@ case $1 in
         member_add
         cluster="${cluster},${this_node}"
       fi
+
+    <% if spec.bootstrap %>
     fi
+    <% end %>
 
     # Sleep to allow member_add to propagate to entire cluster because starting
     # the server subsequently expects all peers to agree on the cluster members

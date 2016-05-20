@@ -84,6 +84,11 @@ case $1 in
       my_id=$(extract_my_id "${prior_member_list}")
       if [ -z "${my_id}" ]; then
         member_add
+      fi
+
+      # If the node was just added, or the node has been added but isn't started,
+      # ensure it's in the cluster list
+      if [[ "${cluster}" != *"${this_node}"* ]]; then
         cluster="${cluster},${this_node}"
       fi
 
